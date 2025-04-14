@@ -1,0 +1,48 @@
+name: Digital Services Act
+abbreviation: DSA
+jurisdiction: European Union
+version: "2022/2065"
+
+violation_categories:
+  - id: illegal_content
+    name: Illegal Content
+    article: "Article 16"
+    description: "Content that violates EU or member state law"
+    severity_baseline: p1
+
+  - id: hate_speech
+    name: Hate Speech
+    article: "Article 16(6)"
+    description: "Content inciting hatred against protected groups"
+    severity_baseline: p1
+
+  - id: disinformation
+    name: Disinformation
+    article: "Article 34"
+    description: "Systematic dissemination of false information"
+    severity_baseline: p2
+
+  - id: consumer_protection
+    name: Consumer Protection Violations
+    article: "Article 31"
+    description: "Deceptive commercial practices or misleading advertising"
+    severity_baseline: p3
+
+  - id: minor_safety
+    name: Minor Safety
+    article: "Article 28"
+    description: "Content harmful to minors"
+    severity_baseline: p0
+
+  - id: transparency
+    name: Transparency Violations
+    article: "Article 14"
+    description: "Failure to provide transparent content moderation"
+    severity_baseline: p3
+
+severity_scale:
+  p0: "Imminent harm requiring immediate action (child safety, terrorism)"
+  p1: "Serious violation requiring action within hours"
+  p2: "Moderate violation requiring action within days"
+  p3: "Minor violation for routine review queue"
+  p4: "Informational finding, no action required"
