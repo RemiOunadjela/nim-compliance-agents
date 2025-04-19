@@ -1,0 +1,8 @@
+services:
+  compliance-review:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - ./output:/app/output
+    command: ["review", "--input", "/app/output/content.txt", "--framework", "dsa"]
