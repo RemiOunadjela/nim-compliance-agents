@@ -25,10 +25,10 @@ Consider these factors:
 Respond with a JSON object containing:
 - severity: one of "p0", "p1", "p2", "p3", "p4"
 - reasoning: a clear explanation of how you arrived at the severity score
-- regulatory_exposure: which regulatory bodies or authorities are relevant
-- recommended_action: specific steps the platform should take
+- regulatory_exposure: a single string describing which regulatory bodies or authorities are relevant
+- recommended_action: a single string describing specific steps the platform should take
 
-Respond ONLY with valid JSON. No explanations outside the JSON."""
+All values must be strings, not arrays. Respond ONLY with valid JSON. No explanations outside the JSON."""
 
 USER_PROMPT_TEMPLATE = """\
 ## Violations Identified
@@ -71,6 +71,9 @@ class RiskAgent:
             try:
                 response = await self._provider.complete(prompt, system=SYSTEM_PROMPT)
                 data = parse_json_response(response)
+                for field in ("regulatory_exposure", "recommended_action", "reasoning"):
+                    if isinstance(data.get(field), list):
+                        data[field] = "; ".join(str(x) for x in data[field])
                 assessment = RiskAssessment(**data)
                 logger.info("Risk agent scored severity: %s", assessment.severity.value)
                 return state.model_copy(update={"risk_assessment": assessment})
