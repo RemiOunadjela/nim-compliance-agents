@@ -25,10 +25,11 @@ Consider these factors:
 Respond with a JSON object containing:
 - severity: one of "p0", "p1", "p2", "p3", "p4"
 - reasoning: a clear explanation of how you arrived at the severity score
-- regulatory_exposure: a single string describing which regulatory bodies or authorities are relevant
-- recommended_action: a single string describing specific steps the platform should take
+- regulatory_exposure: a single string with relevant regulatory bodies
+- recommended_action: a single string with specific platform steps
 
-All values must be strings, not arrays. Respond ONLY with valid JSON. No explanations outside the JSON."""
+All values must be strings, not arrays.
+Respond ONLY with valid JSON. No explanations outside the JSON."""
 
 USER_PROMPT_TEMPLATE = """\
 ## Violations Identified
