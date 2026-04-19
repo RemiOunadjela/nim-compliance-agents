@@ -41,3 +41,20 @@ class TestGraphExecution:
         content = "Original content for review."
         state = await run_review(content, mock_provider, framework_name="dsa")
         assert state.content == content
+
+    @pytest.mark.asyncio
+    async def test_agent_timings_populated_with_violations(self, mock_provider):
+        state = await run_review("test content", mock_provider, framework_name="dsa")
+        assert "policy" in state.agent_timings
+        assert "risk_and_evidence" in state.agent_timings
+        assert "report" in state.agent_timings
+        assert all(v >= 0.0 for v in state.agent_timings.values())
+
+    @pytest.mark.asyncio
+    async def test_agent_timings_populated_clean_content(self):
+        provider = MockProvider(return_clean=True)
+        state = await run_review("safe content", provider, framework_name="dsa")
+        assert "policy" in state.agent_timings
+        assert "report" in state.agent_timings
+        # No violations means risk_and_evidence node was skipped
+        assert "risk_and_evidence" not in state.agent_timings

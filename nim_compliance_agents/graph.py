@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import time
 from typing import Any, TypedDict
 
 from langgraph.graph import END, StateGraph
@@ -61,30 +62,40 @@ def build_graph(
 
     async def policy_review(state: GraphState) -> GraphState:
         compliance_state = state["state"]
+        t0 = time.perf_counter()
         updated = await policy_agent.run(compliance_state)
-        return {"state": updated}
+        elapsed = time.perf_counter() - t0
+        timings = {**updated.agent_timings, "policy": round(elapsed, 3)}
+        return {"state": updated.model_copy(update={"agent_timings": timings})}
 
     async def risk_and_evidence(state: GraphState) -> GraphState:
         """Run risk and evidence agents concurrently, then merge results."""
         compliance_state = state["state"]
+        t0 = time.perf_counter()
         risk_result, evidence_result = await asyncio.gather(
             risk_agent.run(compliance_state),
             evidence_agent.run(compliance_state),
         )
+        elapsed = time.perf_counter() - t0
         # Merge the outputs from both concurrent agents
+        timings = {**compliance_state.agent_timings, "risk_and_evidence": round(elapsed, 3)}
         merged = compliance_state.model_copy(
             update={
                 "risk_assessment": risk_result.risk_assessment,
                 "evidence": evidence_result.evidence,
                 "error": risk_result.error or evidence_result.error,
+                "agent_timings": timings,
             }
         )
         return {"state": merged}
 
     async def report_generation(state: GraphState) -> GraphState:
         compliance_state = state["state"]
+        t0 = time.perf_counter()
         updated = await report_agent.run(compliance_state)
-        return {"state": updated}
+        elapsed = time.perf_counter() - t0
+        timings = {**updated.agent_timings, "report": round(elapsed, 3)}
+        return {"state": updated.model_copy(update={"agent_timings": timings})}
 
     def should_analyze(state: GraphState) -> str:
         """Route based on whether violations were found."""
