@@ -115,7 +115,7 @@ def review(
 
     violation_count = len(state.violations)
     if violation_count > 0:
-        severity = state.risk_assessment.severity.value if state.risk_assessment else "unknown"
+        severity = state.risk_assessment.severity.label if state.risk_assessment else "unknown"
         console.print(
             f"\n[bold red]{violation_count} violation(s) found[/bold red] — severity: {severity}"
         )

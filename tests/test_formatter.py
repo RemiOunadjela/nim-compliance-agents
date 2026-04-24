@@ -90,6 +90,38 @@ class TestToMarkdown:
         assert result == "# Pre-generated report\nSome content."
 
 
+class TestSeverityLabels:
+    def test_p0_label(self):
+        assert Severity.P0.label == "Critical (P0)"
+
+    def test_p1_label(self):
+        assert Severity.P1.label == "High (P1)"
+
+    def test_p2_label(self):
+        assert Severity.P2.label == "Medium (P2)"
+
+    def test_p3_label(self):
+        assert Severity.P3.label == "Low (P3)"
+
+    def test_p4_label(self):
+        assert Severity.P4.label == "Informational (P4)"
+
+    def test_markdown_uses_human_readable_severity(self, state_with_violations_and_timings):
+        result = to_markdown(state_with_violations_and_timings)
+        assert "High (P1)" in result
+        assert "p1" not in result.split("## Risk Assessment")[1].split("\n")[1]
+
+    def test_json_includes_severity_label(self, state_with_violations_and_timings):
+        result = json.loads(to_json(state_with_violations_and_timings))
+        assert result["risk_assessment"]["severity_label"] == "High (P1)"
+        assert result["risk_assessment"]["severity"] == "p1"
+
+    def test_json_no_risk_assessment_severity_label_absent(self):
+        state = ComplianceState(content="test", framework="dsa")
+        result = json.loads(to_json(state))
+        assert result["risk_assessment"] is None
+
+
 class TestToJson:
     def test_agent_timings_in_output(self, state_with_timings):
         result = json.loads(to_json(state_with_timings))

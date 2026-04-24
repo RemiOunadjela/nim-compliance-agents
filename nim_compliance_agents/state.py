@@ -16,6 +16,18 @@ class Severity(str, Enum):
     P3 = "p3"  # Minor violation, routine review
     P4 = "p4"  # Informational, no action required
 
+    @property
+    def label(self) -> str:
+        """Human-readable label, e.g. 'Critical (P0)'."""
+        _names: dict[str, str] = {
+            "p0": "Critical",
+            "p1": "High",
+            "p2": "Medium",
+            "p3": "Low",
+            "p4": "Informational",
+        }
+        return f"{_names[self.value]} ({self.value.upper()})"
+
 
 class Violation(BaseModel):
     """A single policy violation identified during content review."""
