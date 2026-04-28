@@ -58,12 +58,19 @@ def cli() -> None:
     default=None,
     help="Write report to file instead of stdout.",
 )
+@click.option(
+    "--verbose",
+    is_flag=True,
+    default=False,
+    help="Print per-agent trace summaries before the report.",
+)
 def review(
     input_path: Path,
     framework: str,
     mock: bool,
     output_format: str,
     output_path: Path | None,
+    verbose: bool,
 ) -> None:
     """Review content against a regulatory compliance framework."""
     content = input_path.read_text(encoding="utf-8")
@@ -95,6 +102,12 @@ def review(
     )
 
     state = asyncio.run(run_review(content, provider, framework_name=framework))
+
+    if verbose and state.agent_traces:
+        console.print("\n[bold]Agent traces:[/bold]")
+        for trace in state.agent_traces:
+            console.print(f"  [dim]{trace}[/dim]")
+        console.print()
 
     if state.error:
         console.print(f"[yellow]Warning:[/yellow] {state.error}")

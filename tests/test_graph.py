@@ -58,3 +58,41 @@ class TestGraphExecution:
         assert "report" in state.agent_timings
         # No violations means risk_and_evidence node was skipped
         assert "risk_and_evidence" not in state.agent_timings
+
+
+class TestAgentTraces:
+    @pytest.mark.asyncio
+    async def test_traces_populated_with_violations(self, mock_provider):
+        state = await run_review("test content", mock_provider, framework_name="dsa")
+        assert len(state.agent_traces) == 3
+        assert any("[policy]" in t for t in state.agent_traces)
+        assert any("[risk]" in t for t in state.agent_traces)
+        assert any("[report]" in t for t in state.agent_traces)
+
+    @pytest.mark.asyncio
+    async def test_traces_populated_clean_content(self):
+        provider = MockProvider(return_clean=True)
+        state = await run_review("safe content", provider, framework_name="dsa")
+        assert len(state.agent_traces) == 2
+        assert any("[policy]" in t for t in state.agent_traces)
+        assert any("[report]" in t for t in state.agent_traces)
+        assert not any("[risk]" in t for t in state.agent_traces)
+
+    @pytest.mark.asyncio
+    async def test_policy_trace_mentions_no_violations_for_clean_content(self):
+        provider = MockProvider(return_clean=True)
+        state = await run_review("safe content", provider, framework_name="dsa")
+        policy_trace = next(t for t in state.agent_traces if "[policy]" in t)
+        assert "no violations" in policy_trace
+
+    @pytest.mark.asyncio
+    async def test_policy_trace_lists_violation_categories(self, mock_provider):
+        state = await run_review("test content", mock_provider, framework_name="dsa")
+        policy_trace = next(t for t in state.agent_traces if "[policy]" in t)
+        assert "violation(s) found" in policy_trace
+
+    @pytest.mark.asyncio
+    async def test_report_trace_includes_char_count(self, mock_provider):
+        state = await run_review("test content", mock_provider, framework_name="dsa")
+        report_trace = next(t for t in state.agent_traces if "[report]" in t)
+        assert "char report" in report_trace

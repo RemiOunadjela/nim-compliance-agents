@@ -70,3 +70,4 @@ class ComplianceState(BaseModel):
     report: str | None = None
     error: str | None = None
     agent_timings: dict[str, float] = Field(default_factory=dict)
+    agent_traces: list[str] = Field(default_factory=list)
