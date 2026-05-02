@@ -89,8 +89,13 @@ def review(
 
             provider = NIMProvider()
         except ValueError as exc:
-            console.print(f"[red]Error:[/red] {exc}")
-            console.print("Hint: use --mock to run without an API key.")
+            console.print(
+                Panel(
+                    f"{exc}\n\n[dim]Run with [bold]--mock[/bold] to test without a real API key.[/dim]",
+                    title="[red]API key missing[/red]",
+                    border_style="red",
+                )
+            )
             sys.exit(1)
 
     console.print(
@@ -101,7 +106,17 @@ def review(
         )
     )
 
-    state = asyncio.run(run_review(content, provider, framework_name=framework))
+    try:
+        state = asyncio.run(run_review(content, provider, framework_name=framework))
+    except PermissionError as exc:
+        console.print(
+            Panel(
+                str(exc),
+                title="[red]Authentication error[/red]",
+                border_style="red",
+            )
+        )
+        sys.exit(1)
 
     if verbose and state.agent_traces:
         console.print("\n[bold]Agent traces:[/bold]")

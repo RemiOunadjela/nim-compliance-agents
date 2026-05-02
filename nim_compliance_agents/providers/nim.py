@@ -25,8 +25,11 @@ class NIMProvider(LLMProvider):
         self._settings = settings or get_settings()
         if not self._settings.nvidia_api_key:
             raise ValueError(
-                "NVIDIA_API_KEY is required for the NIM provider. "
-                "Set it in your environment or .env file."
+                "NVIDIA_API_KEY is not set.\n\n"
+                "Export it in your shell before running:\n"
+                "  export NVIDIA_API_KEY=nvapi-...\n\n"
+                "Or add it to a .env file in the project directory.\n"
+                "Get a free key at https://build.nvidia.com/explore/discover."
             )
         self._client = httpx.AsyncClient(
             base_url=self._settings.nvidia_api_base,
@@ -63,7 +66,24 @@ class NIMProvider(LLMProvider):
                 response.raise_for_status()
                 data = response.json()
                 return data["choices"][0]["message"]["content"]
-            except (httpx.HTTPStatusError, httpx.RequestError, KeyError) as exc:
+            except httpx.HTTPStatusError as exc:
+                if exc.response.status_code in (401, 403):
+                    raise PermissionError(
+                        f"NIM API authentication failed (HTTP {exc.response.status_code}). "
+                        "Check that NVIDIA_API_KEY is valid and has not expired.\n"
+                        "Rotate or verify your key at https://build.nvidia.com/explore/discover."
+                    ) from exc
+                last_error = exc
+                wait = 2**attempt
+                logger.warning(
+                    "NIM request failed (attempt %d/%d): %s — retrying in %ds",
+                    attempt + 1,
+                    self._settings.llm_max_retries,
+                    exc,
+                    wait,
+                )
+                await asyncio.sleep(wait)
+            except (httpx.RequestError, KeyError) as exc:
                 last_error = exc
                 wait = 2**attempt
                 logger.warning(
