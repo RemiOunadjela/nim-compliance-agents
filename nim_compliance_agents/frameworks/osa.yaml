@@ -1,0 +1,60 @@
+name: Online Safety Act
+abbreviation: OSA
+jurisdiction: United Kingdom
+version: "2023/50"
+
+violation_categories:
+  - id: child_sexual_abuse_material
+    name: Child Sexual Abuse Material
+    article: "Schedule 6, Part 1"
+    description: "CSAM and indecent images of children — Category A priority illegal content requiring immediate removal"
+    severity_baseline: p0
+
+  - id: terrorism_content
+    name: Terrorism Content
+    article: "Schedule 7, Part 1"
+    description: "Content promoting, facilitating, or glorifying terrorist acts or proscribed organisations"
+    severity_baseline: p0
+
+  - id: harm_to_children
+    name: Harmful Content to Children
+    article: "Section 11-12"
+    description: "Content harmful to children including suicide and self-harm encouragement, eating disorder promotion, and online abuse"
+    severity_baseline: p1
+
+  - id: fraud_and_scams
+    name: Fraud and Financial Scams
+    article: "Section 39"
+    description: "Fraudulent advertising including fake investment schemes, romance scams, and impersonation fraud"
+    severity_baseline: p1
+
+  - id: harassment_and_stalking
+    name: Harassment and Stalking
+    article: "Schedule 7, Part 2"
+    description: "Content amounting to stalking, harassment, or coercive control offences under UK criminal law"
+    severity_baseline: p2
+
+  - id: age_assurance_failure
+    name: Age Assurance Failure
+    article: "Section 70"
+    description: "Failure to implement proportionate age assurance for pornographic content or adult-only services"
+    severity_baseline: p2
+
+  - id: user_reporting_systems
+    name: User Reporting Systems
+    article: "Section 20"
+    description: "Failure to provide accessible and effective mechanisms for users to report harmful or illegal content"
+    severity_baseline: p3
+
+  - id: transparency_reporting
+    name: Transparency Reporting Duty
+    article: "Section 69"
+    description: "Failure to publish annual transparency reports meeting Ofcom's content moderation disclosure requirements"
+    severity_baseline: p3
+
+severity_scale:
+  p0: "Imminent harm requiring immediate action (child safety, terrorism)"
+  p1: "Serious violation requiring action within hours"
+  p2: "Moderate violation requiring action within days"
+  p3: "Minor violation for routine review queue"
+  p4: "Informational finding, no action required"
